@@ -1,19 +1,25 @@
 # AR AI
 
-AR AI is an Android AI assistant project. The first milestone is a clean Java-based Android app shell with a dark interface. AI model integration will be added in a later step.
+A Persian Android chat app written in Java. It connects to the locally running ServLlama API and uses the downloaded LFM GGUF model.
 
-## Current status
+## Requirements
+- Android phone
+- ServLlama installed
+- The LFM model downloaded and selected in ServLlama
+- ServLlama server started at `http://127.0.0.1:8080`
 
-- [x] Android project scaffold
-- [x] Main screen in Java
-- [ ] Connect an open-source AI model
-- [ ] Add image input
-- [ ] Add voice input and spoken responses
+## Build the APK
+The GitHub Actions workflow is at `.github/workflows/build-apk.yml`.
 
-## Build
+1. Open the repository's **Actions** tab.
+2. Select **Build AR AI APK**.
+3. If no run has started, use **Run workflow** on the `main` branch.
+4. Open the successful run and find **Artifacts**.
+5. Download **AR-AI-debug-apk**, extract it, and install `app-debug.apk`.
 
-Open this repository in Android Studio, allow Gradle sync, then run the `app` configuration on an Android device or emulator.
+## How it works
+The APK sends requests to `http://127.0.0.1:8080/v1/completions` on the same Android phone. Start the ServLlama server before chatting.
 
-## Important
+The APK does not contain the 1 GB model. ServLlama hosts the model locally, so the app requires ServLlama to remain installed and its server to be running.
 
-No paid API or secret key is included in this repository. Do not commit passwords, API keys, or private tokens.
+This is a debug APK for testing, not a Play Store release.
