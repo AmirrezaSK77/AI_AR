@@ -1,25 +1,35 @@
 # AR AI
 
-A Persian Android chat app written in Java. It connects to the locally running ServLlama API and uses the downloaded LFM GGUF model.
+A Persian Android chat app and responsive web chat interface.
 
-## Requirements
-- Android phone
-- ServLlama installed
-- The LFM model downloaded and selected in ServLlama
-- ServLlama server started at `http://127.0.0.1:8080`
+## Web version
 
-## Build the APK
-The GitHub Actions workflow is at `.github/workflows/build-apk.yml`.
+The web interface is in `index.html`. It is a static front end and does **not** run the AI model by itself.
+
+To publish it for free with GitHub Pages:
+
+1. Open **Settings → Pages** in this repository.
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
+3. Choose branch **main** and folder **/(root)**, then press **Save**.
+4. Wait for GitHub Pages to publish the site. The URL will be `https://amirrezask77.github.io/AI_AR/`.
+
+GitHub Pages sites are public. Do not put passwords, API keys, or private information in the repository or web page.
+
+## Connecting the model
+
+The web page can send requests to an OpenAI-compatible `/v1/completions` endpoint configured in **تنظیم اتصال**. For a public HTTPS website, the model server must also be reachable through HTTPS and allow browser CORS requests.
+
+A phone-local address such as `127.0.0.1` is only reachable from that same phone. A Tailscale address is only reachable by devices signed into the same private tailnet; it is not a public endpoint. Do not expose an unauthenticated model API to the public internet.
+
+## Android APK
+
+The Android app is written in Java and currently connects to ServLlama at `http://127.0.0.1:8080` on the same phone.
+
+Build workflow: `.github/workflows/build-apk.yml`.
 
 1. Open the repository's **Actions** tab.
 2. Select **Build AR AI APK**.
-3. If no run has started, use **Run workflow** on the `main` branch.
-4. Open the successful run and find **Artifacts**.
-5. Download **AR-AI-debug-apk**, extract it, and install `app-debug.apk`.
+3. Run the workflow on `main` if needed.
+4. Download the `AR-AI-debug-apk` artifact from a successful run.
 
-## How it works
-The APK sends requests to `http://127.0.0.1:8080/v1/completions` on the same Android phone. Start the ServLlama server before chatting.
-
-The APK does not contain the 1 GB model. ServLlama hosts the model locally, so the app requires ServLlama to remain installed and its server to be running.
-
-This is a debug APK for testing, not a Play Store release.
+The APK does not include the model file. Start ServLlama before chatting.
