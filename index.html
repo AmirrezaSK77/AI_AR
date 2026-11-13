@@ -96,7 +96,7 @@
       try{
         const response=await fetch(apiBase+'/v1/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'LFM2.5-2.6B-QAD-Q4_0',prompt:'User: '+text+'\nAssistant:',max_tokens:300,temperature:0.4,stream:false})});
         if(!response.ok)throw new Error('HTTP '+response.status);
-        const data=await response.json();const answer=data.choices?.[0]?.text?.trim()||data.choices?.[0]?.message?.content?.trim()||'پاسخی از مدل دریافت نشد.';
+        const data=await response.json();const choice=data.choices?.[0]||{};const answer=(choice.text||choice.message?.content||choice.delta?.content||data.response||data.generated_text||data.output||'').trim();if(!answer){addMessage('سرور پاسخ خالی برگرداند. خروجی خام برای بررسی:\n'+JSON.stringify(data).slice(0,1800),'bot');setStatus('پاسخ خالی');return;}
         addMessage(answer,'bot');setStatus('پاسخ از سرور دریافت شد',true);
       }catch(err){addMessage('اتصال برقرار نشد: '+err.message+'\nآدرس سرور، HTTPS، CORS و فعال بودن مدل را بررسی کن.','bot');setStatus('اتصال ناموفق');}
       finally{send.disabled=!apiBase;send.textContent='ارسال';}
