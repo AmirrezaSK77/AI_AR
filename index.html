@@ -55,52 +55,54 @@
     <section class="welcome" id="welcome">
       <div class="eyebrow">نسخه وب · AR AI</div>
       <h2>سلام! من AR AI هستم 👋</h2>
-      <p>رابط چت آماده است. برای دریافت پاسخ واقعی از مدل Qwen، باید آدرس امن سرور در تنظیمات وارد شود. این سایت به‌تنهایی مدل را اجرا نمی‌کند.</p>
+      <p>رابط چت آماده است. آدرس API مدل LFM2.5 را در تنظیمات وارد و اتصال را آزمایش کن. برای آدرس محلی، سایت را روی همان گوشی‌ای باز کن که ServLlama روی آن اجراست.</p>
     </section>
     <section class="messages" id="messages" aria-live="polite">
-      <div class="msg bot">به AR AI خوش آمدی! برای اتصال مغز هوش مصنوعی، از دکمه «تنظیم اتصال» استفاده کن.</div>
+      <div class="msg bot">به AR AI خوش آمدی! برای اتصال به مغز، «تنظیم اتصال» را بزن و آدرس API را وارد کن.</div>
     </section>
     <section class="composer">
       <div class="inputrow">
         <textarea id="prompt" rows="1" placeholder="پیامت را بنویس..." aria-label="پیام"></textarea>
         <button class="send" id="send" disabled>ارسال</button>
       </div>
-      <div class="tools"><span>مدل هدف: Qwen3.5-0.8B · MNN</span><button class="linkbtn" id="settings">⚙ تنظیم اتصال</button></div>
+      <div class="tools"><span>مدل هدف: LFM2.5-2.6B-QAD-Q4_0</span><button class="linkbtn" id="settings">⚙ تنظیم اتصال</button></div>
       <p class="notice">برای اتصال عمومی، سرور باید از HTTPS و دسترسی امن برخوردار باشد. آدرس localhost یا Tailscale فقط برای دستگاه‌های مجاز قابل استفاده است.</p>
     </section>
   </main>
   <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
     <div class="dialog">
       <h3 id="dialogTitle">تنظیم اتصال به مغز AR AI</h3>
-      <p>آدرس پایه API سرور را وارد کن. برای سایت عمومی، آدرس باید HTTPS باشد و سرور باید درخواست‌های مرورگر (CORS) را مجاز کند. فعلاً آدرس گوشی یا Tailscale را برای بازدیدکنندگان عمومی وارد نکن.</p>
-      <label for="api">API Base URL (HTTPS)</label>
-      <input id="api" type="url" placeholder="https://your-secure-api.example" autocomplete="url">
-      <div class="actions"><button class="cancel" id="cancel">بستن</button><button class="save" id="save">ذخیره</button></div>
+      <p>اگر سایت را روی همان گوشی‌ای باز کرده‌ای که ServLlama روی آن اجراست، این آدرس را وارد کن. آدرس 127.0.0.1 فقط به همان دستگاه اشاره می‌کند؛ روی گوشی دیگر کار نمی‌کند. برای سایت عمومی باید بعداً سرور HTTPS امن داشته باشیم.</p>
+      <label for="api">API Base URL</label>
+      <input id="api" type="url" placeholder="http://127.0.0.1:8080" autocomplete="url" value="http://127.0.0.1:8080">
+      <div class="actions"><button class="cancel" id="cancel">بستن</button><button class="save" id="save">ذخیره و تست</button></div>
     </div>
   </div>
   <script>
     const $ = id => document.getElementById(id);
     const messages = $('messages'), promptBox = $('prompt'), send = $('send');
-    let apiBase = '';
+    let apiBase = localStorage.getItem('arAiApiBase') || '';
     function setStatus(text, online=false){$('statusText').textContent=text;$('dot').style.background=online?'#36d399':'#e4a84d';$('dot').style.boxShadow=online?'0 0 10px #36d39988':'0 0 10px #e4a84d88';}
     function addMessage(text, who){const el=document.createElement('div');el.className='msg '+(who==='user'?'user':'bot');el.textContent=text;messages.appendChild(el);el.scrollIntoView({behavior:'smooth',block:'end'});}
     function toggleSettings(open){$('overlay').classList.toggle('open',open);if(open)$('api').value=apiBase;}
     $('settings').addEventListener('click',()=>toggleSettings(true));
     $('cancel').addEventListener('click',()=>toggleSettings(false));
     $('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))toggleSettings(false)});
-    $('save').addEventListener('click',()=>{const v=$('api').value.trim().replace(/\/$/,'');if(v && !v.startsWith('https://')){alert('برای سایت عمومی، آدرس سرور باید با https:// شروع شود.');return;}apiBase=v;setStatus(apiBase?'آدرس ذخیره شد؛ اتصال هنوز تست نشده':'سرور تنظیم نشده');send.disabled=!apiBase;toggleSettings(false);});
+    async function testConnection(){if(!apiBase){setStatus('سرور تنظیم نشده');return;}setStatus('در حال آزمایش اتصال...');try{const r=await fetch(apiBase+'/v1/models',{method:'GET'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();const found=(d.models||d.data||[]).some(m=>(m.name||m.id||m.model)==='LFM2.5-2.6B-QAD-Q4_0');if(!found)throw new Error('مدل LFM2.5 در فهرست API پیدا نشد');setStatus('مغز متصل است · LFM2.5',true);send.disabled=false;return true;}catch(e){setStatus('اتصال ناموفق');send.disabled=true;addMessage('تست اتصال ناموفق بود: '+e.message+'\nاگر CORS یا خطای شبکه دیدی، ServLlama باید دسترسی مرورگر را مجاز کند و سایت باید روی همان گوشیِ دارای مدل باز باشد.','bot');return false;}}
+    $('save').addEventListener('click',async()=>{const v=$('api').value.trim().replace(/\/$/,'');if(!v){alert('آدرس API را وارد کن.');return;}if(!/^https:\/\//i.test(v)&&!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(v)){alert('برای آدرس غیرمحلی از HTTPS استفاده کن. آدرس محلی باید 127.0.0.1 یا localhost باشد.');return;}apiBase=v;localStorage.setItem('arAiApiBase',apiBase);toggleSettings(false);await testConnection();});
     async function sendMessage(){
       const text=promptBox.value.trim();if(!text||!apiBase)return;
       addMessage(text,'user');promptBox.value='';send.disabled=true;send.textContent='...';
       try{
-        const response=await fetch(apiBase+'/v1/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'Qwen3.5-0.8B-MNN',prompt:'User: '+text+'\nAssistant:',max_tokens:220,temperature:0.4,stream:false})});
+        const response=await fetch(apiBase+'/v1/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'LFM2.5-2.6B-QAD-Q4_0',prompt:'User: '+text+'\nAssistant:',max_tokens:300,temperature:0.4,stream:false})});
         if(!response.ok)throw new Error('HTTP '+response.status);
-        const data=await response.json();const answer=data.choices?.[0]?.text?.trim()||'پاسخی از مدل دریافت نشد.';
+        const data=await response.json();const answer=data.choices?.[0]?.text?.trim()||data.choices?.[0]?.message?.content?.trim()||'پاسخی از مدل دریافت نشد.';
         addMessage(answer,'bot');setStatus('پاسخ از سرور دریافت شد',true);
       }catch(err){addMessage('اتصال برقرار نشد: '+err.message+'\nآدرس سرور، HTTPS، CORS و فعال بودن مدل را بررسی کن.','bot');setStatus('اتصال ناموفق');}
       finally{send.disabled=!apiBase;send.textContent='ارسال';}
     }
     send.addEventListener('click',sendMessage);
+    if(apiBase){$('api').value=apiBase;testConnection();}
     promptBox.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
     promptBox.addEventListener('input',()=>{promptBox.style.height='auto';promptBox.style.height=Math.min(promptBox.scrollHeight,130)+'px';});
   </script>
