@@ -94,9 +94,9 @@
       const text=promptBox.value.trim();if(!text||!apiBase)return;
       addMessage(text,'user');promptBox.value='';send.disabled=true;send.textContent='...';
       try{
-        const response=await fetch(apiBase+'/v1/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'LFM2.5-2.6B-QAD-Q4_0',prompt:'User: '+text+'\nAssistant:',max_tokens:300,temperature:0.4,stream:false})});
-        if(!response.ok)throw new Error('HTTP '+response.status);
-        const data=await response.json();const choice=data.choices?.[0]||{};const answer=(choice.text||choice.message?.content||choice.delta?.content||data.response||data.generated_text||data.output||'').trim();if(!answer){addMessage('سرور پاسخ خالی برگرداند. خروجی خام برای بررسی:\n'+JSON.stringify(data).slice(0,1800),'bot');setStatus('پاسخ خالی');return;}
+        const response=await fetch(apiBase+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'LFM2.5-2.6B-QAD-Q4_0',messages:[{role:'user',content:text}],max_tokens:300,temperature:0.4,stream:false})});
+        const raw=await response.text();if(!response.ok)throw new Error('HTTP '+response.status+' · '+raw.slice(0,500));
+        let data;try{data=JSON.parse(raw)}catch(e){throw new Error('پاسخ JSON معتبر نیست: '+raw.slice(0,500))}const choice=data.choices?.[0]||{};let content=choice.message?.content??choice.text??choice.delta?.content??data.response??data.generated_text??data.output??'';const answer=(Array.isArray(content)?content.map(x=>x.text||'').join(''):String(content)).trim();if(!answer){addMessage('مدل پاسخ متنی نداد. پاسخ خام سرور:\n'+JSON.stringify(data).slice(0,1800),'bot');setStatus('پاسخ خالی');return;}
         addMessage(answer,'bot');setStatus('پاسخ از سرور دریافت شد',true);
       }catch(err){addMessage('اتصال برقرار نشد: '+err.message+'\nآدرس سرور، HTTPS، CORS و فعال بودن مدل را بررسی کن.','bot');setStatus('اتصال ناموفق');}
       finally{send.disabled=!apiBase;send.textContent='ارسال';}
