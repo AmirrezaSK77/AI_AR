@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b16">
+  <meta name="description" content="AR AI — دستیار هوشمند فارسی">
+  <title>AR AI | دستیار هوشمند</title>
+  <style>
+    :root{color-scheme:dark;--bg:#070b16;--panel:#0d1528;--panel2:#111e37;--line:#203456;--blue:#3985ff;--cyan:#50c8ff;--text:#eef4ff;--muted:#91a3c2;--green:#36d399}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#153568 0,transparent 48%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;display:flex;justify-content:center}
+    .app{width:min(100%,900px);min-height:100vh;display:flex;flex-direction:column;padding:16px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 4px 18px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#2369df,#142d5d);box-shadow:0 8px 28px #1b64d844;font-weight:900;font-size:19px;letter-spacing:-1px}
+    h1{font-size:21px;margin:0;letter-spacing:.4px}.sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .status{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:#0b1426;border-radius:999px;padding:8px 11px;color:var(--muted);font-size:12px;white-space:nowrap}
+    .dot{width:8px;height:8px;border-radius:50%;background:#e4a84d;box-shadow:0 0 10px #e4a84d88}
+    .welcome{margin:24px 0 16px;padding:22px;border:1px solid #24436f;border-radius:22px;background:linear-gradient(135deg,#10264a,#0b1427 75%);box-shadow:0 18px 55px #0003}
+    .eyebrow{color:#77bdff;font-size:12px;font-weight:700;margin-bottom:9px}
+    .welcome h2{font-size:clamp(22px,5vw,31px);margin:0 0 9px}
+    .welcome p{margin:0;color:#b5c5df;line-height:1.9;font-size:14px}
+    .messages{flex:1;display:flex;flex-direction:column;gap:12px;padding:8px 2px 18px;min-height:180px}
+    .msg{max-width:88%;padding:13px 16px;border-radius:18px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+    .bot{align-self:flex-start;background:var(--panel2);border:1px solid #203858;border-top-right-radius:5px}
+    .user{align-self:flex-end;background:linear-gradient(135deg,#2368cf,#17499c);border:1px solid #397ee0;border-top-left-radius:5px}
+    .composer{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 18%);padding:16px 0 5px}
+    .inputrow{display:flex;gap:9px;padding:9px;background:#0d172a;border:1px solid #263d61;border-radius:20px;box-shadow:0 12px 38px #0005}
+    textarea{resize:none;min-height:48px;max-height:130px;flex:1;background:transparent;border:0;outline:0;color:var(--text);font:inherit;padding:12px 10px;line-height:1.6}
+    textarea::placeholder{color:#8294b4}
+    button{font:inherit;cursor:pointer;border:0}
+    .send{align-self:flex-end;min-width:84px;height:48px;border-radius:14px;background:linear-gradient(135deg,#3985ff,#2460cb);color:white;font-weight:700}
+    .send:disabled{opacity:.45;cursor:not-allowed}
+    .tools{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 4px;color:var(--muted);font-size:11px}
+    .linkbtn{background:transparent;color:#83baff;padding:7px 3px;font-size:12px}
+    .notice{font-size:11px;color:#8ea0be;line-height:1.8;text-align:center;margin:9px 0 0}
+    .overlay{position:fixed;inset:0;background:#020611cc;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+    .overlay.open{display:flex}
+    .dialog{width:min(100%,460px);background:#0e1930;border:1px solid #2b4770;border-radius:20px;padding:20px;box-shadow:0 25px 90px #0009}
+    .dialog h3{margin:0 0 8px;font-size:19px}.dialog p{font-size:13px;color:var(--muted);line-height:1.8}
+    label{display:block;font-size:12px;color:#c7d6ed;margin:14px 0 7px}
+    input{width:100%;border:1px solid #2b4267;background:#081225;color:white;border-radius:12px;padding:13px;font:inherit;direction:ltr;text-align:left}
+    .actions{display:flex;gap:9px;margin-top:16px}.actions button{flex:1;padding:12px;border-radius:12px;font-weight:700}
+    .save{background:#2e77e8;color:white}.cancel{background:#1a2943;color:#d9e6fa}
+    @media(max-width:520px){.app{padding:12px}.status{font-size:10px;padding:7px 9px}.welcome{padding:18px;margin-top:18px}.msg{max-width:94%}.send{min-width:68px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand"><div class="logo">AR</div><div><h1>AR AI</h1><div class="sub">دستیار هوشمند فارسی</div></div></div>
+      <div class="status"><span class="dot" id="dot"></span><span id="statusText">سرور تنظیم نشده</span></div>
+    </header>
+    <section class="welcome" id="welcome">
+      <div class="eyebrow">نسخه وب · AR AI</div>
+      <h2>سلام! من AR AI هستم 👋</h2>
+      <p>رابط چت آماده است. برای دریافت پاسخ واقعی از مدل Qwen، باید آدرس امن سرور در تنظیمات وارد شود. این سایت به‌تنهایی مدل را اجرا نمی‌کند.</p>
+    </section>
+    <section class="messages" id="messages" aria-live="polite">
+      <div class="msg bot">به AR AI خوش آمدی! برای اتصال مغز هوش مصنوعی، از دکمه «تنظیم اتصال» استفاده کن.</div>
+    </section>
+    <section class="composer">
+      <div class="inputrow">
+        <textarea id="prompt" rows="1" placeholder="پیامت را بنویس..." aria-label="پیام"></textarea>
+        <button class="send" id="send" disabled>ارسال</button>
+      </div>
+      <div class="tools"><span>مدل هدف: Qwen3.5-0.8B · MNN</span><button class="linkbtn" id="settings">⚙ تنظیم اتصال</button></div>
+      <p class="notice">برای اتصال عمومی، سرور باید از HTTPS و دسترسی امن برخوردار باشد. آدرس localhost یا Tailscale فقط برای دستگاه‌های مجاز قابل استفاده است.</p>
+    </section>
+  </main>
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog">
+      <h3 id="dialogTitle">تنظیم اتصال به مغز AR AI</h3>
+      <p>آدرس پایه API سرور را وارد کن. برای سایت عمومی، آدرس باید HTTPS باشد و سرور باید درخواست‌های مرورگر (CORS) را مجاز کند. فعلاً آدرس گوشی یا Tailscale را برای بازدیدکنندگان عمومی وارد نکن.</p>
+      <label for="api">API Base URL (HTTPS)</label>
+      <input id="api" type="url" placeholder="https://your-secure-api.example" autocomplete="url">
+      <div class="actions"><button class="cancel" id="cancel">بستن</button><button class="save" id="save">ذخیره</button></div>
+    </div>
+  </div>
+  <script>
+    const $ = id => document.getElementById(id);
+    const messages = $('messages'), promptBox = $('prompt'), send = $('send');
+    let apiBase = '';
+    function setStatus(text, online=false){$('statusText').textContent=text;$('dot').style.background=online?'#36d399':'#e4a84d';$('dot').style.boxShadow=online?'0 0 10px #36d39988':'0 0 10px #e4a84d88';}
+    function addMessage(text, who){const el=document.createElement('div');el.className='msg '+(who==='user'?'user':'bot');el.textContent=text;messages.appendChild(el);el.scrollIntoView({behavior:'smooth',block:'end'});}
+    function toggleSettings(open){$('overlay').classList.toggle('open',open);if(open)$('api').value=apiBase;}
+    $('settings').addEventListener('click',()=>toggleSettings(true));
+    $('cancel').addEventListener('click',()=>toggleSettings(false));
+    $('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))toggleSettings(false)});
+    $('save').addEventListener('click',()=>{const v=$('api').value.trim().replace(/\/$/,'');if(v && !v.startsWith('https://')){alert('برای سایت عمومی، آدرس سرور باید با https:// شروع شود.');return;}apiBase=v;setStatus(apiBase?'آدرس ذخیره شد؛ اتصال هنوز تست نشده':'سرور تنظیم نشده');send.disabled=!apiBase;toggleSettings(false);});
+    async function sendMessage(){
+      const text=promptBox.value.trim();if(!text||!apiBase)return;
+      addMessage(text,'user');promptBox.value='';send.disabled=true;send.textContent='...';
+      try{
+        const response=await fetch(apiBase+'/v1/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'Qwen3.5-0.8B-MNN',prompt:'User: '+text+'\nAssistant:',max_tokens:220,temperature:0.4,stream:false})});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const data=await response.json();const answer=data.choices?.[0]?.text?.trim()||'پاسخی از مدل دریافت نشد.';
+        addMessage(answer,'bot');setStatus('پاسخ از سرور دریافت شد',true);
+      }catch(err){addMessage('اتصال برقرار نشد: '+err.message+'\nآدرس سرور، HTTPS، CORS و فعال بودن مدل را بررسی کن.','bot');setStatus('اتصال ناموفق');}
+      finally{send.disabled=!apiBase;send.textContent='ارسال';}
+    }
+    send.addEventListener('click',sendMessage);
+    promptBox.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+    promptBox.addEventListener('input',()=>{promptBox.style.height='auto';promptBox.style.height=Math.min(promptBox.scrollHeight,130)+'px';});
+  </script>
+</body>
+</html>
